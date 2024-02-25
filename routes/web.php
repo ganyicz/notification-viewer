@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
+use Livewire\Volt\Volt;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +15,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/notifications');
+
+Volt::route('/notifications', 'notifications')->name('notifications.index');
+
+Route::get('/notifications/{notification}', function ($notification) {
+    return File::get(storage_path('notifications/' . $notification . '.html'));
+})->name('notifications.view');
+
+// Added to avoid route not found errors in auth notifications
+Route::get('/reset-password')->name('password.reset');

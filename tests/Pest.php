@@ -11,6 +11,12 @@
 |
 */
 
+use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Str;
+
+
 uses(
     Tests\TestCase::class,
     // Illuminate\Foundation\Testing\RefreshDatabase::class,
@@ -42,7 +48,21 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function sendable($notification, $closure = null)
 {
-    // ..
+    $description = Str::afterLast($notification, "\\");
+
+    if ($closure && (new ReflectionFunction($closure))->getNumberOfParameters() > 0) {
+        return test($description, function (...$args) use ($closure) {
+            $notification = $closure(...$args);
+            
+            $notification->toMail(new AnonymousNotifiable)->render();
+        })->throwsNoExceptions();
+    } else {
+        return test($description, function () use ($notification, $closure) {
+            $notification = $closure ? $closure() : new $notification;
+
+            $notification->toMail(new AnonymousNotifiable)->render();
+        })->throwsNoExceptions();
+    }
 }
