@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 beforeEach(fn () => Notification::swap(new NotificationSink));
 afterEach(fn () => Notification::store());
 
-beforeEach()->throwsNoExceptions();
+beforeEach()->expectNotToPerformAssertions();
 
 test('user registered', function () {
     $user = User::factory()->create();
